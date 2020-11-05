@@ -3,19 +3,18 @@ export default class CreateElement {
     this.tag = tag;
   }
 
-  create(content, attributes, inlineStyle, eventsArray) {
-    this._content = content;
-    this._attributes = attributes;
-
+  create(content, attributes, classes, eventsArray, inlineStyle) {
     this._element = document.createElement(this.tag);
 
-    this.setInnerHTML(this._content);
+    this.setInnerHTML(content);
 
-    this._attributes && this.setAttributes(this._attributes);
+    attributes && this.setAttributes(attributes);
 
-    this.setInlineStyle(this._element, inlineStyle);
+    this.setCSS(classes);
 
     this.setEvents(eventsArray);
+
+    this.setInlineStyle(this._element, inlineStyle);
     return this._element;
   }
 
@@ -24,13 +23,19 @@ export default class CreateElement {
       this._element.innerHTML = content;
     } else {
       content.forEach((item) => {
-        this._element.appendChild(item);
+        if (Object.prototype.toString.call(item).includes("Array")) {
+          item.forEach((subitem) => {
+            this._element.appendChild(subitem());
+          });
+        } else {
+          this._element.appendChild(item());
+        }
       });
     }
   }
 
   setAttributes(attributes) {
-    const keys = Array.from(Object.keys(attributes));
+    const keys = Object.keys(attributes);
     keys.forEach((key) => {
       const value = attributes[key];
       this._element.setAttribute(key, value);
@@ -46,6 +51,19 @@ export default class CreateElement {
       eventsArray.forEach(({ type, callback }) => {
         this._element.addEventListener(type, callback);
       });
+    }
+  }
+  setCSS(classes) {
+    if (classes) {
+      const styleTag = document.querySelector("style");
+      if (!styleTag) {
+        const styleTag = document.createElement("style");
+        styleTag.innerHTML += classes;
+        document.querySelector("head").appendChild(styleTag);
+        return;
+      }
+      if (!styleTag.innerText.includes(classes))
+        styleTag.innerHTML += classes;
     }
   }
 }
@@ -75,3 +93,42 @@ export default class CreateElement {
 // console.log(animaisDiv);
 // const animaisSection = section.create(animaisDiv, attributes);
 // document.body.appendChild(animaisSection);
+
+// setCSS(classes) {
+//   classes
+//     .split(" {")
+//     .map((item) => item.trim())
+//     .filter((item) => {
+//       return item.startsWith(".") || item.startsWith("#");
+//     })
+//     .map((item) => {
+//       return item.replace(".", "") || item.replace("#", "");
+//     })
+//     .forEach((item) => {
+//       this._element.classList.add(item);
+//     });
+//   const styleTag = document.querySelector("style");
+//   if (!styleTag) {
+//     const styleTag = document.createElement("style");
+//     styleTag.innerHTML += classes;
+//     document.querySelector("head").appendChild(styleTag);
+//     return;
+//   }
+//   styleTag.innerHTML += classes;
+// }
+
+// classes
+// .split(".")
+// .map((item) => {
+//   return item.trim();
+// })
+// .filter((item) => {
+//   console.log(item);
+//   return item.startsWith(".") || item.startsWith("#");
+// })
+// .map((item) => {
+//   return item.replace(".", "") || item.replace("#", "");
+// })
+// .forEach((item) => {
+//   this._element.classList.add(item);
+// });
