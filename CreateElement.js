@@ -21,16 +21,13 @@ export default class CreateElement {
   setInnerHTML(content) {
     if (typeof content === "string") {
       this._element.innerHTML = content;
-    } else {
-      content.forEach((item) => {
-        if (Object.prototype.toString.call(item).includes("Array")) {
-          item.forEach((subitem) => {
-            this._element.appendChild(subitem());
-          });
-        } else {
-          this._element.appendChild(item());
-        }
+    } else if (Object.prototype.toString.call(content).includes("Array")) {
+      const newContent = [].concat(...content);
+      newContent.forEach((item) => {
+        this._element.appendChild(item());
       });
+    } else {
+      throw new Error("Content is not a 'String' or an 'Array'");
     }
   }
 
@@ -62,73 +59,7 @@ export default class CreateElement {
         document.querySelector("head").appendChild(styleTag);
         return;
       }
-      if (!styleTag.innerText.includes(classes))
-        styleTag.innerHTML += classes;
+      if (!styleTag.innerText.includes(classes)) styleTag.innerHTML += classes;
     }
   }
 }
-
-// const attributes = {
-//   class: "animais to-right",
-//   "data-anime": "false",
-// };
-
-// const styles = {
-//   backgroundColor: "blue",
-//   fontSize: "2rem",
-//   color: "white",
-// };
-
-// const section = new CreateElement("section");
-// const div = new CreateElement("div");
-
-// const animaisDiv = div.create("<p>Esse é um parágrafo</p>", attributes);
-// div.setInlineStyle(animaisDiv, {
-//   backgroundColor: "green",
-//   fontSize: "3rem",
-//   color: "white",
-//   display: "inline-block",
-// });
-
-// console.log(animaisDiv);
-// const animaisSection = section.create(animaisDiv, attributes);
-// document.body.appendChild(animaisSection);
-
-// setCSS(classes) {
-//   classes
-//     .split(" {")
-//     .map((item) => item.trim())
-//     .filter((item) => {
-//       return item.startsWith(".") || item.startsWith("#");
-//     })
-//     .map((item) => {
-//       return item.replace(".", "") || item.replace("#", "");
-//     })
-//     .forEach((item) => {
-//       this._element.classList.add(item);
-//     });
-//   const styleTag = document.querySelector("style");
-//   if (!styleTag) {
-//     const styleTag = document.createElement("style");
-//     styleTag.innerHTML += classes;
-//     document.querySelector("head").appendChild(styleTag);
-//     return;
-//   }
-//   styleTag.innerHTML += classes;
-// }
-
-// classes
-// .split(".")
-// .map((item) => {
-//   return item.trim();
-// })
-// .filter((item) => {
-//   console.log(item);
-//   return item.startsWith(".") || item.startsWith("#");
-// })
-// .map((item) => {
-//   return item.replace(".", "") || item.replace("#", "");
-// })
-// .forEach((item) => {
-//   this._element.classList.add(item);
-// });
