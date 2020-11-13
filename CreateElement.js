@@ -19,15 +19,17 @@ export default class CreateElement {
   }
 
   setInnerHTML(content) {
-    if (typeof content === "string") {
+    const typeOfContent = (type) =>
+      Object.prototype.toString.call(content).includes(type);
+    if (typeOfContent("String")) {
       this._element.innerHTML = content;
-    } else if (Object.prototype.toString.call(content).includes("Array")) {
+    } else if (typeOfContent("Array")) {
       const newContent = [].concat(...content);
       newContent.forEach((item) => {
         this._element.appendChild(item());
       });
     } else {
-      throw new Error("Content is not a 'String' or an 'Array'");
+      throw new Error("Content is not a 'String' nor an 'Array'");
     }
   }
 
